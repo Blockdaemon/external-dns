@@ -171,6 +171,8 @@ func main() {
 		p, err = provider.NewExoscaleProvider(cfg.ExoscaleEndpoint, cfg.ExoscaleAPIKey, cfg.ExoscaleAPISecret, cfg.DryRun, provider.ExoscaleWithDomain(domainFilter), provider.ExoscaleWithLogging()), nil
 	case "inmemory":
 		p, err = provider.NewInMemoryProvider(provider.InMemoryInitZones(cfg.InMemoryZones), provider.InMemoryWithDomain(domainFilter), provider.InMemoryWithLogging()), nil
+	case "hook":
+		p, err = provider.NewInMemoryProvider(provider.InMemoryInitZones(cfg.HookZones), provider.InMemoryWithDomain(domainFilter), provider.InMemoryWithHook(cfg.HookExe)), nil
 	case "designate":
 		p, err = provider.NewDesignateProvider(domainFilter, cfg.DryRun)
 	case "pdns":

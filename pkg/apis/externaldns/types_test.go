@@ -78,6 +78,8 @@ var (
 		ExoscaleAPISecret:       "",
 		CRDSourceAPIVersion:     "externaldns.k8s.io/v1alpha1",
 		CRDSourceKind:           "DNSEndpoint",
+		HookZones:               []string{""},
+		HookExe:                 "external-dns-hook",
 	}
 
 	overriddenConfig = &Config{
@@ -134,6 +136,8 @@ var (
 		ExoscaleAPISecret:       "2",
 		CRDSourceAPIVersion:     "test.k8s.io/v1alpha1",
 		CRDSourceKind:           "Endpoint",
+		HookZones:               []string{"example.org", "company.com"},
+		HookExe:                 "/bin/echo",
 	}
 )
 
@@ -213,6 +217,9 @@ func TestParseFlags(t *testing.T) {
 				"--exoscale-apisecret=2",
 				"--crd-source-apiversion=test.k8s.io/v1alpha1",
 				"--crd-source-kind=Endpoint",
+				"--hook-zone=example.org",
+				"--hook-zone=company.com",
+				"--hook-exe=/bin/echo",
 			},
 			envVars:  map[string]string{},
 			expected: overriddenConfig,
@@ -273,6 +280,8 @@ func TestParseFlags(t *testing.T) {
 				"EXTERNAL_DNS_EXOSCALE_APISECRET":         "2",
 				"EXTERNAL_DNS_CRD_SOURCE_APIVERSION":      "test.k8s.io/v1alpha1",
 				"EXTERNAL_DNS_CRD_SOURCE_KIND":            "Endpoint",
+				"EXTERNAL_DNS_HOOK_ZONE":                  "example.org\ncompany.com",
+				"EXTERNAL_DNS_HOOK_EXE":                   "/bin/echo",
 			},
 			expected: overriddenConfig,
 		},

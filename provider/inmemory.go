@@ -19,6 +19,8 @@ package provider
 import (
 	"errors"
 	"strings"
+	"encoding/json"
+	"os/exec"
 
 	log "github.com/sirupsen/logrus"
 
@@ -67,6 +69,38 @@ func InMemoryWithLogging() InMemoryOption {
 			}
 			for _, v := range changes.Delete {
 				log.Infof("DELETE: %v", v)
+			}
+		}
+	}
+}
+
+func execHook(hook string, op string, v interface{}) string {
+	arg, err := json.Marshal(v)
+	if err != nil {
+		return err.Error()
+	}
+	cmd := exec.Command(hook, op, string(arg))
+	out, err := cmd.CombinedOutput()
+	if err != nil {
+		return err.Error()
+	}
+	return string(out)
+}
+
+func InMemoryWithHook(hook string) InMemoryOption {
+	return func(p *InMemoryProvider) {
+		p.OnApplyChanges = func(changes *plan.Changes) {
+			for _, v := range changes.Create {
+				log.Infof("%s", execHook(hook, "Create", v))
+			}
+			for _, v := range changes.UpdateOld {
+				log.Infof("%s", execHook(hook, "UpdateOld", v))
+			}
+			for _, v := range changes.UpdateNew {
+				log.Infof("%s", execHook(hook, "UpdateNew", v))
+			}
+			for _, v := range changes.Delete {
+				log.Infof("%s", execHook(hook, "Delete", v))
 			}
 		}
 	}
